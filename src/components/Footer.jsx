@@ -7,7 +7,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-3">
-              ShopEase
+              SwaGlow
             </h2>
             <p className="text-sm">
               Your one-stop destination for quality products at
@@ -88,7 +88,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-sm">
-          © {new Date().getFullYear()} ShopEase. All rights reserved.
+          © {new Date().getFullYear()} SwaGlow. All rights reserved.
         </div>
       </div>
     </footer>

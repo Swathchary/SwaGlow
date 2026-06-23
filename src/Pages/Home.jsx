@@ -1,5 +1,6 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { CartContext } from "../CartContext";
 
 
 const Home = () => {
@@ -7,6 +8,7 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [cart, setCart] = useState([]);
+    const { addToCart } = useContext(CartContext);
 
     const getProducts = async () => {
 
@@ -50,11 +52,11 @@ const Home = () => {
 
         <div>
 
-<section className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">       
-    
-             <div className="max-w-7xl mx-auto px-6 py-24 text-center">
+            <section className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
+
+                <div className="max-w-7xl mx-auto px-6 py-24 text-center">
                     <h1 className="text-5xl font-bold mb-4">
-                        Welcome to ShopEase
+                        Welcome to SwaGlow
                     </h1>
 
                     <p className="text-lg mb-8">
@@ -72,9 +74,6 @@ const Home = () => {
                     Featured Products
                 </h2>
 
-                <h3 className="text-xl font-bold mb-4">
-                    Cart Items: {cart.length}
-                </h3>
                 {loading ? (
                     <div className="text-center text-lg">
                         Loading products...
@@ -107,7 +106,7 @@ const Home = () => {
                                         ${item.price}
                                     </p>
 
-                                    <button onClick={() => handleAddToCart(item)}
+                                    <button onClick={() => addToCart(item)}
                                         className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
                                         Add to Cart
                                     </button>
