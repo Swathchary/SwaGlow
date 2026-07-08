@@ -46,11 +46,11 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="/contact" className="hover:text-white">
                   Contact Us
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="hover:text-white">
                   FAQ
                 </a>
@@ -59,7 +59,7 @@ export default function Footer() {
                 <a href="#" className="hover:text-white">
                   Shipping Policy
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 

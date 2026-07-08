@@ -54,7 +54,7 @@ const Home = () => {
 
             <section className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
 
-                <div className="max-w-7xl mx-auto px-6 py-24 text-center">
+                <div className="max-w-7xl mx-auto px-6 py-16 text-center">
                     <h1 className="text-5xl font-bold mb-4">
                         Welcome to SwaGlow
                     </h1>
@@ -63,9 +63,9 @@ const Home = () => {
                         Discover amazing products at great prices.
                     </p>
 
-                    <button className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-indigo-100 transition duration-300">
+                    {/* <button className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-indigo-100 transition duration-300">
                         Shop Now
-                    </button>
+                    </button> */}
                 </div>
             </section>
 

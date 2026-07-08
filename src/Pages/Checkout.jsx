@@ -1,8 +1,10 @@
 import { useContext, useState } from "react";
 import { CartContext } from "../CartContext";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
     const { cart } = useContext(CartContext);
+    const navigate = useNavigate();
 
     const [form, setForm] = useState({
         name: "",
@@ -29,11 +31,10 @@ const Checkout = () => {
             alert("Your cart is empty!");
             return;
         }
+           
+          navigate(`/success?name=${form.name}&total=${total.toFixed(2)}`);
 
-        alert(`Order placed successfully 🎉
-Name: ${form.name}
-Total: $${total.toFixed(2)}`);
-
+           
         console.log("Order Details:", {
             customer: form,
             cart,

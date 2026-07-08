@@ -44,7 +44,7 @@ const Products = () => {
             <div className="text-center py-10 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                 <h1 className="text-4xl font-bold">Our Products</h1>
                 <p className="mt-2">Find the best products at best prices</p>
-                <p className="mt-2 font-semibold">Cart Items: {cart.length}</p>
+                {/* <p className="mt-2 font-semibold">Cart Items: {cart.length}</p> */}
             </div>
 
             {/* Content */}
