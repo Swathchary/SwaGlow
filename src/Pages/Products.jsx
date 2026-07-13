@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useContext } from "react";
 import { CartContext } from "../CartContext";
-
+import { useNavigate } from "react-router-dom";
 const Products = () => {
 
     const { addToCart } = useContext(CartContext);
@@ -9,6 +9,7 @@ const Products = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [cart, setCart] = useState([]);
+    const navigate = useNavigate();
 
     // Fetch products
     const getProducts = async () => {
@@ -55,11 +56,13 @@ const Products = () => {
                         Loading products...
                     </h2>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
                         {products.map((item) => (
                             <div
                                 key={item.id}
+                                onClick={() => navigate(`/product/${item.id}`)}
                                 className="bg-white rounded-xl shadow-md hover:shadow-xl transition p-4"
                             >
                                 {/* Image */}

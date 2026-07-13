@@ -31,11 +31,11 @@ export default function Footer() {
                   Products
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="/cart" className="hover:text-white">
                   Cart
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 

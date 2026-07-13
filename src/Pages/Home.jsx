@@ -1,156 +1,143 @@
-
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { CartContext } from "../CartContext";
-
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [cart, setCart] = useState([]);
     const { addToCart } = useContext(CartContext);
 
-    const getProducts = async () => {
+    const [categories, setCategories] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
+    // Fetch Categories
+    const getCategories = async () => {
         try {
-            setLoading(true)
-            const response = await fetch("https://fakestoreapi.com/products");
-
+            const response = await fetch(
+                "https://fakestoreapi.com/products/categories"
+            );
             const data = await response.json();
 
-            console.log('response', data)
-            setProducts(data);
-            setLoading(false)
-
+            setCategories(data);
         } catch (error) {
-            console.log("error", error)
-        } finally {
-
-            setLoading(false)
-            console.log("finally")
-
+            console.log(error);
         }
+    };
 
-    }
+    // Fetch Products
+    const getProducts = async (category = "all") => {
+        try {
+            setLoading(true);
 
+            const url =
+                category === "all"
+                    ? "https://fakestoreapi.com/products"
+                    : `https://fakestoreapi.com/products/category/${category}`;
 
+            const response = await fetch(url);
+            const data = await response.json();
+
+            setProducts(data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-
+        getCategories();
         getProducts();
-
     }, []);
 
-
-    const handleAddToCart = (product) => {
-        setCart((prevCart) => [...prevCart, product]);
-
-        console.log("Added to cart:", product);
+    const handleCategory = (category) => {
+        setSelectedCategory(category);
+        getProducts(category);
     };
 
     return (
+        <div className="min-h-screen bg-gray-100">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-10 text-center">
+                <h1 className="text-4xl font-bold">Our Products</h1>
+                <p className="mt-2">Browse by Category</p>
+            </div>
 
-        <div>
+            <div className="max-w-7xl mx-auto px-6 py-8">
 
-            <section className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
+                {/* Categories */}
+                <div className="flex flex-wrap gap-3 justify-center mb-8">
+                    <button
+                        onClick={() => handleCategory("all")}
+                        className={`px-5 py-2 rounded-full ${
+                            selectedCategory === "all"
+                                ? "bg-blue-600 text-white"
+                                : "bg-white shadow"
+                        }`}
+                    >
+                        All
+                    </button>
 
-                <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-                    <h1 className="text-5xl font-bold mb-4">
-                        Welcome to SwaGlow
-                    </h1>
-
-                    <p className="text-lg mb-8">
-                        Discover amazing products at great prices.
-                    </p>
-
-                    {/* <button className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-indigo-100 transition duration-300">
-                        Shop Now
-                    </button> */}
+                    {categories.map((category) => (
+                        <button
+                            key={category}
+                            onClick={() => handleCategory(category)}
+                            className={`px-5 py-2 rounded-full capitalize ${
+                                selectedCategory === category
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-white shadow"
+                            }`}
+                        >
+                            {category}
+                        </button>
+                    ))}
                 </div>
-            </section>
 
-            <section className="max-w-7xl mx-auto px-6 py-16">
-                <h2 className="text-3xl font-bold mb-10 text-center">
-                    Featured Products
-                </h2>
-
+                {/* Products */}
                 {loading ? (
-                    <div className="text-center text-lg">
-                        Loading products...
-                    </div>
+                    <h2 className="text-center text-xl font-semibold">
+                        Loading...
+                    </h2>
                 ) : (
-
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {products.map((item) => (
                             <div
                                 key={item.id}
-                                className="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden"
+                                onClick={() => navigate(`/product/${item.id}`)}
+                                className="bg-white rounded-xl shadow-md hover:shadow-xl transition p-4"
                             >
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="h-56 w-full object-contain p-4"
+                                    className="h-48 w-full object-contain"
                                 />
 
-                                <div className="p-4">
-                                    <h3 className="font-semibold text-sm h-12 overflow-hidden">
-                                        {item.title}
-                                    </h3>
+                                <h3 className="font-semibold text-sm mt-3 h-12 overflow-hidden">
+                                    {item.title}
+                                </h3>
 
-                                    <p className="text-yellow-500 mt-2">
-                                        ⭐ {item.rating.rate}
-                                    </p>
+                                <p className="text-yellow-500 mt-2">
+                                    ⭐ {item.rating.rate}
+                                </p>
 
-                                    <p className="text-blue-600 font-bold text-lg mt-2">
-                                        ${item.price}
-                                    </p>
+                                <p className="text-green-600 font-bold text-xl mt-2">
+                                    ${item.price}
+                                </p>
 
-                                    <button onClick={() => addToCart(item)}
-                                        className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-                                        Add to Cart
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={() => addToCart(item)}
+                                    className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:from-purple-700 hover:to-pink-600"
+                                >
+                                    Add to Cart
+                                </button>
                             </div>
                         ))}
                     </div>
                 )}
-            </section>
-
-
-            <section className="bg-gray-100 py-16">
-                <div className="max-w-7xl mx-auto px-6">
-                    <h2 className="text-3xl font-bold text-center mb-10">
-                        Why Shop With Us?
-                    </h2>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-6 rounded-xl text-center shadow">
-                            <h3 className="font-semibold text-xl mb-2">
-                                Fast Delivery
-                            </h3>
-                            <p>Get your products delivered quickly.</p>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-xl text-center shadow">
-                            <h3 className="font-semibold text-xl mb-2">
-                                Secure Payments
-                            </h3>
-                            <p>Safe and trusted payment methods.</p>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-xl text-center shadow">
-                            <h3 className="font-semibold text-xl mb-2">
-                                Quality Products
-                            </h3>
-                            <p>Best products from trusted brands.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
+            </div>
         </div>
-    )
-}
+    );
+};
 
 export default Home;
