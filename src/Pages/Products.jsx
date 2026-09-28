@@ -1,105 +1,240 @@
-import { useEffect, useState } from "react";
-import { useContext } from "react";
-import { CartContext } from "../CartContext";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import ProductCard from "../components/ProductCard";
+import useProducts from "../hooks/useProducts";
+
 const Products = () => {
 
-    const { addToCart } = useContext(CartContext);
+    const {
+        products,
+        loading,
+        error,
+    } = useProducts();
 
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [cart, setCart] = useState([]);
-    const navigate = useNavigate();
+    const [search, setSearch] = useState("");
+    const [category, setCategory] = useState("All");
 
-    // Fetch products
-    const getProducts = async () => {
-        try {
-            setLoading(true);
+    const categories = useMemo(() => {
 
-            const response = await fetch("https://fakestoreapi.com/products");
-            const data = await response.json();
+        return [
+            ...new Set(
+                products
+                    .map((product) =>
+                        product.category?.trim()
+                    )
+                    .filter(Boolean)
+            ),
+        ].sort();
 
-            setProducts(data);
-        } catch (error) {
-            console.log("Error:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [products]);
 
-    useEffect(() => {
-        getProducts();
-    }, []);
+    const filteredProducts = useMemo(() => {
 
-    // Add to cart
-    // const handleAddToCart = (product) => {
-    //     setCart((prev) => [...prev, product]);
+        return products.filter((product) => {
 
+            const matchesSearch =
+                product.name
+                    ?.toLowerCase()
+                    .includes(search.toLowerCase());
 
-    // };
+            const matchesCategory =
+                category === "All" ||
+                product.category === category;
+
+            return (
+                matchesSearch &&
+                matchesCategory
+            );
+
+        });
+
+    }, [products, search, category]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="
+            min-h-screen
+            bg-gray-50
+            dark:bg-gray-950
+        ">
 
-            {/* Header */}
-            <div className="text-center py-10 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-                <h1 className="text-4xl font-bold">Our Products</h1>
-                <p className="mt-2">Find the best products at best prices</p>
-                {/* <p className="mt-2 font-semibold">Cart Items: {cart.length}</p> */}
-            </div>
+            {/* HERO */}
 
-            {/* Content */}
-            <div className="max-w-7xl mx-auto px-6 py-10">
+            <section className="
+                bg-gradient-to-r
+                from-pink-500
+                to-purple-600
+                text-white
+                py-12
+                text-center
+            ">
 
-                {loading ? (
-                    <h2 className="text-center text-xl font-semibold">
-                        Loading products...
-                    </h2>
-                ) : (
-                    <div
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <h1 className="
+                    text-4xl
+                    md:text-5xl
+                    font-black
+                ">
+                    Our Products
+                </h1>
 
-                        {products.map((item) => (
-                            <div
-                                key={item.id}
-                                onClick={() => navigate(`/product/${item.id}`)}
-                                className="bg-white rounded-xl shadow-md hover:shadow-xl transition p-4"
+                <p className="mt-3">
+                    Browse our approved products
+                </p>
+
+            </section>
+
+            <main className="
+                max-w-7xl
+                mx-auto
+                px-4
+                sm:px-6
+                lg:px-8
+                py-10
+            ">
+
+                {/* SEARCH */}
+
+                <div className="
+                    flex
+                    flex-col
+                    md:flex-row
+                    gap-4
+                    mb-8
+                ">
+
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(e.target.value)
+                        }
+                        className="
+                            flex-1
+                            px-4
+                            py-3
+                            rounded-xl
+                            border
+                            border-gray-200
+                            dark:border-gray-700
+                            bg-white
+                            dark:bg-gray-900
+                            outline-none
+                            focus:ring-2
+                            focus:ring-pink-500
+                        "
+                    />
+
+                    <select
+                        value={category}
+                        onChange={(e) =>
+                            setCategory(e.target.value)
+                        }
+                        className="
+                            px-5
+                            py-3
+                            rounded-xl
+                            border
+                            border-gray-200
+                            dark:border-gray-700
+                            bg-white
+                            dark:bg-gray-900
+                            outline-none
+                        "
+                    >
+
+                        <option value="All">
+                            All Categories
+                        </option>
+
+                        {categories.map((item) => (
+                            <option
+                                key={item}
+                                value={item}
                             >
-                                {/* Image */}
-                                <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="h-48 w-full object-contain p-2"
-                                />
+                                {item}
+                            </option>
+                        ))}
 
-                                {/* Title */}
-                                <h3 className="font-semibold text-sm mt-2 h-12 overflow-hidden">
-                                    {item.title}
-                                </h3>
+                    </select>
 
-                                {/* Rating */}
-                                <p className="text-yellow-500 mt-1">
-                                    ⭐ {item.rating.rate}
-                                </p>
+                </div>
 
-                                {/* Price */}
-                                <p className="text-green-600 font-bold text-lg mt-1">
-                                    ${item.price}
-                                </p>
+                {/* LOADING */}
 
-                                {/* Button */}
-                                <button
-                                    onClick={() => addToCart(item)}
-                                    className="w-full mt-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition"
-                                >
-                                    Add to Cart
-                                </button>
-                            </div>
+                {loading && (
+                    <p className="
+                        text-center
+                        py-20
+                        text-gray-500
+                    ">
+                        Loading products...
+                    </p>
+                )}
+
+                {/* ERROR */}
+
+                {!loading && error && (
+                    <p className="
+                        text-center
+                        py-20
+                        text-red-500
+                    ">
+                        {error}
+                    </p>
+                )}
+
+                {/* PRODUCTS */}
+
+                {!loading &&
+                    !error &&
+                    filteredProducts.length > 0 && (
+
+                    <div className="
+                        grid
+                        grid-cols-1
+                        sm:grid-cols-2
+                        md:grid-cols-3
+                        lg:grid-cols-4
+                        gap-6
+                    ">
+
+                        {filteredProducts.map((product) => (
+                            <ProductCard
+                                key={product._id}
+                                product={product}
+                            />
                         ))}
 
                     </div>
                 )}
-            </div>
+
+                {/* EMPTY */}
+
+                {!loading &&
+                    !error &&
+                    filteredProducts.length === 0 && (
+
+                    <div className="
+                        text-center
+                        py-20
+                    ">
+                        <h2 className="
+                            text-2xl
+                            font-bold
+                        ">
+                            No products found
+                        </h2>
+
+                        <p className="
+                            text-gray-500
+                            mt-2
+                        ">
+                            No approved products are available.
+                        </p>
+                    </div>
+                )}
+
+            </main>
+
         </div>
     );
 };

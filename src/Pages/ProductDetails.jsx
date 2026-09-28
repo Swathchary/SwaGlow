@@ -1,93 +1,209 @@
-import { useEffect, useState, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { CartContext } from "../CartContext";
+import { useEffect, useState } from "react";
+import {
+    useNavigate,
+    useParams,
+} from "react-router-dom";
+
+import { useCart } from "../context/CartContext";
+
+const API_URL =
+    "http://localhost:5000/api/products";
 
 const ProductDetails = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
-    const { addToCart } = useContext(CartContext);
 
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const { addToCart } = useCart();
+
+    const [product, setProduct] =
+        useState(null);
+
+    const [loading, setLoading] =
+        useState(true);
+
+
+    const getProduct = async () => {
+        try {
+            setLoading(true);
+
+            const token =
+                localStorage.getItem("token");
+
+            const response = await fetch(
+                `${API_URL}/${id}`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (data.status) {
+                setProduct(
+                    data.product
+                );
+            }
+
+        } catch (error) {
+            console.error(
+                "Product details error:",
+                error
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                const response = await fetch(
-                    `https://fakestoreapi.com/products/${id}`
-                );
-                const data = await response.json();
-                setProduct(data);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProduct();
+        getProduct();
     }, [id]);
+
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen text-xl">
-                Loading...
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+
+                <p className="text-xl font-semibold text-pink-600">
+                    Loading product...
+                </p>
+
             </div>
         );
     }
 
-    return (
-        <div className="min-h-screen bg-gray-100 py-10">
-            <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-8">
+
+    if (!product) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
+
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                    Product not found
+                </h2>
 
                 <button
-                    onClick={() => navigate(-1)}
-                    className="mb-6 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+                    onClick={() =>
+                        navigate(
+                            "/customer/products"
+                        )
+                    }
+                    className="mt-5 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg"
+                >
+                    Back to Products
+                </button>
+
+            </div>
+        );
+    }
+
+
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10">
+
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+
+                <button
+                    onClick={() =>
+                        navigate(-1)
+                    }
+                    className="mb-8 text-pink-600 font-semibold"
                 >
                     ← Back
                 </button>
 
-                <div className="grid md:grid-cols-2 gap-10">
 
-                    <div className="flex justify-center">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+
+                    {/* IMAGE */}
+
+                    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-xl p-8">
+
                         <img
                             src={product.image}
-                            alt={product.title}
-                            className="h-96 object-contain"
+                            alt={product.name}
+                            className="max-h-96 w-full object-contain"
                         />
+
                     </div>
 
-                    <div>
-                        <h1 className="text-3xl font-bold">
-                            {product.title}
-                        </h1>
 
-                        <p className="text-gray-500 mt-2 capitalize">
+                    {/* DETAILS */}
+
+                    <div>
+
+                        <p className="text-sm uppercase font-semibold text-pink-600">
                             {product.category}
                         </p>
 
-                        <p className="text-yellow-500 text-lg mt-4">
-                            ⭐ {product.rating.rate} ({product.rating.count} Reviews)
+
+                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mt-3">
+                            {product.name}
+                        </h1>
+
+
+                        <p className="text-3xl font-bold text-pink-600 mt-6">
+                            ₹{product.price}
                         </p>
 
-                        <h2 className="text-4xl font-bold text-green-600 mt-4">
-                            ${product.price}
-                        </h2>
 
-                        <p className="text-gray-700 mt-6 leading-7">
+                        <p className="text-gray-600 dark:text-gray-300 mt-6 leading-7">
                             {product.description}
                         </p>
 
+
+                        <p className="mt-5 text-gray-600 dark:text-gray-300">
+                            Available stock:{" "}
+                            <strong>
+                                {product.stock}
+                            </strong>
+                        </p>
+
+
                         <button
-                            onClick={() => addToCart(product)}
-                            className="mt-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-pink-600"
+                            disabled={
+                                product.stock <=
+                                0
+                            }
+                            onClick={() =>
+                                addToCart(
+                                    product
+                                )
+                            }
+                            className={`w-full mt-8 py-3 rounded-xl font-semibold text-white ${
+                                product.stock <=
+                                0
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-purple-600 hover:to-pink-500"
+                            }`}
                         >
-                            Add to Cart
+                            {product.stock <= 0
+                                ? "Out of Stock"
+                                : "Add to Cart"}
                         </button>
+
+
+                        <button
+                            onClick={() =>
+                                navigate(
+                                    "/customer/cart"
+                                )
+                            }
+                            className="w-full mt-3 border border-pink-500 text-pink-600 py-3 rounded-xl font-semibold"
+                        >
+                            View Cart
+                        </button>
+
                     </div>
 
                 </div>
+
             </div>
+
         </div>
     );
 };
