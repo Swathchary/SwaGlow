@@ -11,8 +11,8 @@ const createAdmin = async () => {
 
         console.log("MongoDB connected");
 
-        const adminEmail = "admin@swaglow.com";
-        const adminPassword = "Admin@123456";
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
 
         const existingAdmin = await User.findOne({
             email: adminEmail,
