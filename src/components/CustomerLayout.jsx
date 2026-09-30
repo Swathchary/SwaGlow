@@ -6,7 +6,7 @@ import {
     Package,
     ShoppingCart,
     User,
-    handleLogout,
+    LogOut,
     Menu,
     X,
     Sun,
