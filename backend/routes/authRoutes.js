@@ -4,7 +4,7 @@ import {
     registerUser,
     loginUser,
     createSalesperson,
-} from "../controllers/authController.js";
+} from "../Controllers/authController.js";
 
 import protect from "../middleware/authMiddleware.js";
 import authorizeRoles from "../middleware/roleMiddleware.js";
