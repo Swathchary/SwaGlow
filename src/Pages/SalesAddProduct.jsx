@@ -43,7 +43,7 @@ const SalesAddProduct = () => {
             }
 
             const response = await fetch(
-                "http://localhost:5000/api/products",
+                "https://glow-mchc.onrender.com/api/products",
                 {
                     method: "POST",
                     headers: {

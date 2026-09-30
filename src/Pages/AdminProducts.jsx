@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://glow-mchc.onrender.com/api"; //http://localhost:5000/api
 
 const AdminProducts = () => {
 

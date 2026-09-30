@@ -21,7 +21,7 @@ const FetchProductsAPi = () => {
 
         try {
 
-            const response = await axios.get("http://localhost:5000/swaglow/ToGetProducts");
+            const response = await axios.get("https://glow-mchc.onrender.com/swaglow/ToGetProducts");
 
             console.log("prosss", response);
 

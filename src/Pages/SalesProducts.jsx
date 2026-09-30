@@ -17,7 +17,7 @@ const SalesProducts = () => {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                "http://localhost:5000/api/products/my-products",
+                "https://glow-mchc.onrender.com/api/products/my-products",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

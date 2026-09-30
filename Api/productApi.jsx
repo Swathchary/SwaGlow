@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/swaglow';
+const API_URL =   'https://glow-mchc.onrender.com'      //'http://localhost:5000/swaglow';
 
 
 const getDataProduct = async()=>{

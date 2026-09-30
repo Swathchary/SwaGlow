@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://glow-mchc.onrender.com/api";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -68,7 +68,7 @@ const [stats, setStats] = useState({
 const fetchStats = async (token) => {
     try {
         const response = await fetch(
-            "http://localhost:5000/api/products/admin/stats",
+            "https://glow-mchc.onrender.com/api/products/admin/stats",
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
-const API_URL = "http://localhost:5000/api/products";
+const API_URL = "https://glow-mchc.onrender.com/api/products";
 
 const Home = () => {
     const { addToCart } = useCart();

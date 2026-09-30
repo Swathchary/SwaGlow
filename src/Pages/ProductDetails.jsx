@@ -7,7 +7,7 @@ import {
 import { useCart } from "../context/CartContext";
 
 const API_URL =
-    "http://localhost:5000/api/products";
+    "https://glow-mchc.onrender.com/api/products";
 
 const ProductDetails = () => {
     const { id } = useParams();
