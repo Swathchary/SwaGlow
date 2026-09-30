@@ -43,11 +43,20 @@ function Login() {
                 throw new Error(data.message || "Login failed");
             }
 
-            localStorage.setItem("token", data.token);
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
             localStorage.setItem(
                 "user",
                 JSON.stringify(data.user)
             );
+
+            window.dispatchEvent(
+                new Event("userChanged")
+            );
+
             if (data.user.role === "admin") {
                 navigate("/admin", { replace: true });
             } else if (data.user.role === "salesperson") {

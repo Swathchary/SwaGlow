@@ -32,12 +32,15 @@ const Checkout = () => {
 
     const [error, setError] = useState("");
 
+    const [paymentMethod, setPaymentMethod] = useState("cod");
+    const [isProcessing, setIsProcessing] = useState(false);
+
     // Calculate subtotal
     const subtotal = cartItems.reduce(
         (total, item) =>
             total +
             Number(item.price || 0) *
-                Number(item.quantity || 1),
+            Number(item.quantity || 1),
         0
     );
 
@@ -75,51 +78,78 @@ const Checkout = () => {
             !form.state.trim() ||
             !form.pincode.trim()
         ) {
-            setError(
-                "Please fill in all delivery details."
-            );
+            setError("Please fill in all delivery details.");
             return;
         }
 
         if (!/^[0-9]{10}$/.test(form.phone.trim())) {
-            setError(
-                "Please enter a valid 10-digit phone number."
-            );
+            setError("Please enter a valid 10-digit phone number.");
             return;
         }
 
         if (!/^[0-9]{6}$/.test(form.pincode.trim())) {
-            setError(
-                "Please enter a valid 6-digit PIN code."
-            );
+            setError("Please enter a valid 6-digit PIN code.");
             return;
         }
 
-        // Save order information temporarily
-        const orderData = {
-            items: cartItems,
-            deliveryDetails: form,
-            subtotal,
-            deliveryCharge,
-            total,
-            paymentMethod: "Cash on Delivery",
-        };
+        setError("");
 
-        sessionStorage.setItem(
-            "swaglow_last_order",
-            JSON.stringify(orderData)
-        );
+        // -------------------------
+        // CASH ON DELIVERY
+        // -------------------------
+        if (paymentMethod === "cod") {
 
-        // Clear customer's cart
-        clearCart();
+            const orderData = {
+                items: cartItems,
+                deliveryDetails: form,
+                subtotal,
+                deliveryCharge,
+                total,
+                paymentMethod: "Cash on Delivery",
+                paymentStatus: "Pending",
+            };
 
-        // Go to success page
-        navigate("/customer/success", {
-            replace: true,
-        });
-    };
+            sessionStorage.setItem(
+                "swaglow_last_order",
+                JSON.stringify(orderData)
+            );
 
-    // Empty cart
+            clearCart();
+
+            navigate("/customer/OrderSucess", {
+                replace: true,
+            });
+
+            return;
+        }
+
+        // -------------------------
+        // TEST PAYMENT
+        // -------------------------
+        if (paymentMethod === "test") {
+
+            const orderData = {
+                items: cartItems,
+                deliveryDetails: form,
+                subtotal,
+                deliveryCharge,
+                total,
+                paymentMethod: "Test Payment",
+                paymentStatus: "Pending",
+            };
+
+            sessionStorage.setItem(
+                "swaglow_pending_order",
+                JSON.stringify(orderData)
+            );
+
+            navigate("/customer/testpayment", {
+                replace: true,
+            });
+
+            return;
+        }
+    };    // Empty cart
     if (cartItems.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-10">
@@ -227,6 +257,7 @@ const Checkout = () => {
                     <div className="lg:col-span-2">
 
                         <form
+                            id="checkout-form"
                             onSubmit={handlePlaceOrder}
                             className="
                                 bg-white
@@ -494,6 +525,7 @@ const Checkout = () => {
                             </div>
 
                             {/* PAYMENT */}
+                            {/* PAYMENT */}
                             <div className="mt-8 pt-7 border-t border-gray-200 dark:border-gray-800">
 
                                 <div className="flex items-center gap-3">
@@ -511,65 +543,144 @@ const Checkout = () => {
                                         </h2>
 
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            Currently available
+                                            Choose how you want to pay
                                         </p>
                                     </div>
 
                                 </div>
 
-                                <div className="mt-5 rounded-xl border-2 border-purple-500 bg-purple-50 dark:bg-purple-900/20 p-4">
+                                <div className="mt-5 space-y-4">
 
-                                    <div className="flex items-center gap-4">
+                                    {/* CASH ON DELIVERY */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaymentMethod("cod")}
+                                        className={`w-full text-left rounded-xl border-2 p-4 transition ${paymentMethod === "cod"
+                                            ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                                            : "border-gray-200 dark:border-gray-700 hover:border-purple-300"
+                                            }`}
+                                    >
 
-                                        <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center">
-                                            <Truck
-                                                size={20}
-                                                className="text-purple-600"
-                                            />
+                                        <div className="flex items-center gap-4">
+
+                                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center">
+                                                <Truck
+                                                    size={20}
+                                                    className="text-purple-600"
+                                                />
+                                            </div>
+
+                                            <div className="flex-1">
+
+                                                <p className="font-bold text-gray-900 dark:text-white">
+                                                    Cash on Delivery
+                                                </p>
+
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    Pay when your order arrives.
+                                                </p>
+
+                                            </div>
+
+                                            <div
+                                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === "cod"
+                                                    ? "border-purple-600"
+                                                    : "border-gray-400"
+                                                    }`}
+                                            >
+                                                {paymentMethod === "cod" && (
+                                                    <div className="w-2.5 h-2.5 rounded-full bg-purple-600" />
+                                                )}
+                                            </div>
+
                                         </div>
 
-                                        <div>
-                                            <p className="font-bold text-gray-900 dark:text-white">
-                                                Cash on Delivery
-                                            </p>
+                                    </button>
 
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                Pay when your order arrives.
-                                            </p>
+
+                                    {/* TEST PAYMENT */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            console.log("TEST PAYMENT SELECTED");
+                                            setPaymentMethod("test");
+                                            setError("");
+                                        }}
+                                        className={`w-full text-left rounded-xl border-2 p-4 transition ${paymentMethod === "test"
+                                                ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                                : "border-gray-200 dark:border-gray-700 hover:border-green-300"
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+
+                                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center">
+                                                <CreditCard
+                                                    size={20}
+                                                    className="text-green-600"
+                                                />
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <p className="font-bold text-gray-900 dark:text-white">
+                                                    Test Payment
+                                                </p>
+
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    Test payment without real money
+                                                </p>
+                                            </div>
+
+                                            <div
+                                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === "test"
+                                                        ? "border-green-600"
+                                                        : "border-gray-400"
+                                                    }`}
+                                            >
+                                                {paymentMethod === "test" && (
+                                                    <div className="w-2.5 h-2.5 rounded-full bg-green-600" />
+                                                )}
+                                            </div>
+
                                         </div>
-
-                                    </div>
+                                    </button>
 
                                 </div>
 
                             </div>
-
                             {/* PLACE ORDER MOBILE */}
                             <button
                                 type="submit"
+                                disabled={isProcessing}
                                 className="
-                                    w-full
-                                    mt-8
-                                    lg:hidden
-                                    flex
-                                    items-center
-                                    justify-center
-                                    gap-2
-                                    py-4
-                                    rounded-xl
-                                    bg-gradient-to-r
-                                    from-pink-500
-                                    to-purple-600
-                                    text-white
-                                    font-bold
-                                    text-lg
-                                    hover:from-purple-600
-                                    hover:to-pink-500
-                                    transition
-                                "
+        w-full
+        mt-8
+        lg:hidden
+        flex
+        items-center
+        justify-center
+        gap-2
+        py-4
+        rounded-xl
+        bg-gradient-to-r
+        from-pink-500
+        to-purple-600
+        text-white
+        font-bold
+        text-lg
+        hover:from-purple-600
+        hover:to-pink-500
+        transition
+        disabled:opacity-50
+        disabled:cursor-not-allowed
+    "
                             >
-                                Place Order
-                                <ArrowRight size={20} />
+                                {isProcessing
+                                    ? "Processing..."
+                                    : paymentMethod === "cod"
+                                        ? "Place Order"
+                                        : `Pay ₹${total.toLocaleString("en-IN")}`}
+
+                                {!isProcessing && <ArrowRight size={20} />}
                             </button>
 
                         </form>
@@ -644,11 +755,11 @@ const Checkout = () => {
                                             {(
                                                 Number(
                                                     item.price ||
-                                                        0
+                                                    0
                                                 ) *
                                                 Number(
                                                     item.quantity ||
-                                                        1
+                                                    1
                                                 )
                                             ).toLocaleString(
                                                 "en-IN"
@@ -677,7 +788,7 @@ const Checkout = () => {
                                     <span>Delivery</span>
                                     <span className="font-semibold text-gray-900 dark:text-white">
                                         {deliveryCharge ===
-                                        0
+                                            0
                                             ? "FREE"
                                             : `₹${deliveryCharge}`}
                                     </span>
@@ -703,33 +814,34 @@ const Checkout = () => {
                             {/* DESKTOP PLACE ORDER */}
                             <button
                                 type="submit"
-                                form="checkout-form"
-                                onClick={handlePlaceOrder}
+                                    form="checkout-form"
                                 className="
-                                    w-full
-                                    mt-7
-                                    hidden
-                                    lg:flex
-                                    items-center
-                                    justify-center
-                                    gap-2
-                                    py-4
-                                    rounded-xl
-                                    bg-gradient-to-r
-                                    from-pink-500
-                                    to-purple-600
-                                    text-white
-                                    font-bold
-                                    text-lg
-                                    hover:from-purple-600
-                                    hover:to-pink-500
-                                    transition
-                                "
+        w-full
+        mt-7
+        hidden
+        lg:flex
+        items-center
+        justify-center
+        gap-2
+        py-4
+        rounded-xl
+        bg-gradient-to-r
+        from-pink-500
+        to-purple-600
+        text-white
+        font-bold
+        text-lg
+        hover:from-purple-600
+        hover:to-pink-500
+        transition
+    "
                             >
-                                Place Order
+                                {paymentMethod === "cod"
+                                    ? "Place Order"
+                                    : `Pay ₹${total.toLocaleString("en-IN")}`}
+
                                 <ArrowRight size={20} />
                             </button>
-
                         </div>
 
                     </div>

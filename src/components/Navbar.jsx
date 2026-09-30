@@ -17,7 +17,7 @@ const Navbar = () => {
 
     const { cartItems } = useCart();
 
-        const cartCount = cartItems.reduce(
+    const cartCount = cartItems.reduce(
         (total, item) => total + Number(item.quantity || 1),
         0
     );
@@ -133,14 +133,18 @@ const Navbar = () => {
 
 
                         {/* ================= PROFILE ================= */}
-                        <NavLink to="/customer/profile">
-                            <User size={22} />
-                            <span className="hidden sm:block">
-                                Profile
-                            </span>
+
+                        <NavLink
+                            to="/customer/profile"
+                            className="flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition"
+                        >
+                            <User
+                                size={20}
+                                className="text-gray-600 dark:text-gray-300"
+                            />
+
+                            <span>Profile</span>
                         </NavLink>
-
-
                         {/* ================= THEME ================= */}
                         <button
                             type="button"

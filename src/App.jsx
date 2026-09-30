@@ -47,6 +47,8 @@ import Register from "./Pages/Register";
 
 import RequireRole from "./components/RequireRole";
 
+import TestPayment from "./Pages/TestPayment";
+
 function App() {
     return (
         <BrowserRouter>
@@ -176,16 +178,20 @@ function App() {
                             path="checkout"
                             element={<Checkout />}
                         />
+                        <Route
+                            path="testpayment"
+                            element={<TestPayment />}
+                        />
 
                         <Route
                             path="profile"
                             element={<Profile />}
                         />
 
-                            <Route
-                            path = "OrderSucess"
-                            element = {<OrderSucess/>}/>
-                        
+                        <Route
+                            path="OrderSucess"
+                            element={<OrderSucess />} />
+
 
                     </Route>
                 </Route>

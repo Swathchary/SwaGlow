@@ -260,19 +260,27 @@ const Home = () => {
 
                                     {/* IMAGE */}
 
-                                    <div className="h-48 flex items-center justify-center">
+                                   {/* IMAGE */}
 
-                                        <img
-                                            src={
-                                                product.image
-                                            }
-                                            alt={
-                                                product.name
-                                            }
-                                            className="h-44 w-full object-contain"
-                                        />
+<div className="h-48 flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
 
-                                    </div>
+    <img
+        src={product.image}
+        alt={product.name}
+        className="h-44 w-full object-contain"
+        onError={(event) => {
+            event.currentTarget.style.display = "none";
+            event.currentTarget.nextElementSibling.style.display = "flex";
+        }}
+    />
+
+    {/* FALLBACK */}
+
+    <div className="hidden h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-800 text-sm font-semibold text-gray-500 dark:text-gray-300">
+        No Image
+    </div>
+
+</div>
 
 
                                     {/* CATEGORY */}

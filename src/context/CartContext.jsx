@@ -5,23 +5,26 @@ import {
     useState,
 } from "react";
 
-const CartContext = createContext();
+const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
-
     const [cartItems, setCartItems] = useState([]);
+    const [currentUserId, setCurrentUserId] = useState(null);
 
-    // Get currently logged-in user
+    // ==========================================
+    // GET CURRENT USER
+    // ==========================================
+
     const getCurrentUser = () => {
         try {
-            const savedUser = localStorage.getItem("user");
+            const savedUser =
+                localStorage.getItem("user");
 
             if (!savedUser) {
                 return null;
             }
 
             return JSON.parse(savedUser);
-
         } catch (error) {
             console.error(
                 "GET USER ERROR:",
@@ -32,33 +35,92 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Create unique cart key for each user
-    const getCartKey = () => {
+    // ==========================================
+    // GET USER ID
+    // ==========================================
 
+    const getUserId = () => {
         const user = getCurrentUser();
 
         if (!user) {
             return null;
         }
 
-        // Prefer user ID
-        if (user.id) {
-            return `swaglow_cart_${user.id}`;
-        }
-
-        // Fallback to email
-        if (user.email) {
-            return `swaglow_cart_${user.email}`;
-        }
-
-        return null;
+        return (
+            user.id ||
+            user._id ||
+            user.email ||
+            null
+        );
     };
 
+    // ==========================================
+    // CHECK LOGGED-IN USER
+    // ==========================================
 
-    // Load cart whenever logged-in user changes
     useEffect(() => {
+        const checkUser = () => {
+            const userId = getUserId();
 
+            setCurrentUserId(userId);
+        };
+
+        // Check immediately
+        checkUser();
+
+        // Check whenever storage changes
+        window.addEventListener(
+            "storage",
+            checkUser
+        );
+
+        window.addEventListener(
+            "userChanged",
+            checkUser
+        );
+
+        return () => {
+            window.removeEventListener(
+                "storage",
+                checkUser
+            );
+
+            window.removeEventListener(
+                "userChanged",
+                checkUser
+            );
+        };
+
+    }, []);
+
+    // ==========================================
+    // CART KEY
+    // ==========================================
+
+    const getCartKey = () => {
+        if (!currentUserId) {
+            return null;
+        }
+
+        return `swaglow_cart_${currentUserId}`;
+    };
+
+    // ==========================================
+    // LOAD USER CART
+    // ==========================================
+
+    useEffect(() => {
         const cartKey = getCartKey();
+
+        console.log(
+            "LOADING CART FOR:",
+            currentUserId
+        );
+
+        console.log(
+            "CART KEY:",
+            cartKey
+        );
 
         if (!cartKey) {
             setCartItems([]);
@@ -66,29 +128,27 @@ export const CartProvider = ({ children }) => {
         }
 
         try {
-
             const savedCart =
                 localStorage.getItem(cartKey);
 
-            if (savedCart) {
+            console.log(
+                "SAVED USER CART:",
+                savedCart
+            );
 
+            if (savedCart) {
                 const parsedCart =
                     JSON.parse(savedCart);
 
-                setCartItems(
-                    Array.isArray(parsedCart)
-                        ? parsedCart
-                        : []
-                );
-
+                if (Array.isArray(parsedCart)) {
+                    setCartItems(parsedCart);
+                } else {
+                    setCartItems([]);
+                }
             } else {
-
                 setCartItems([]);
-
             }
-
         } catch (error) {
-
             console.error(
                 "LOAD CART ERROR:",
                 error
@@ -96,13 +156,13 @@ export const CartProvider = ({ children }) => {
 
             setCartItems([]);
         }
+    }, [currentUserId]);
 
-    }, []);
+    // ==========================================
+    // SAVE USER CART
+    // ==========================================
 
-
-    // Save cart for current user
     useEffect(() => {
-
         const cartKey = getCartKey();
 
         if (!cartKey) {
@@ -110,32 +170,34 @@ export const CartProvider = ({ children }) => {
         }
 
         try {
-
             localStorage.setItem(
                 cartKey,
                 JSON.stringify(cartItems)
             );
 
+            console.log(
+                "CART SAVED:",
+                cartKey,
+                cartItems
+            );
         } catch (error) {
-
             console.error(
                 "SAVE CART ERROR:",
                 error
             );
         }
+    }, [cartItems, currentUserId]);
 
-    }, [cartItems]);
-
-
-    // ============================
+    // ==========================================
     // ADD TO CART
-    // ============================
+    // ==========================================
 
     const addToCart = (product) => {
+        if (!currentUserId) {
+            console.log(
+                "Cannot add to cart: user not logged in"
+            );
 
-        const user = getCurrentUser();
-
-        if (!user) {
             return;
         }
 
@@ -143,7 +205,6 @@ export const CartProvider = ({ children }) => {
             product._id || product.id;
 
         setCartItems((currentItems) => {
-
             const existingItem =
                 currentItems.find(
                     (item) =>
@@ -152,41 +213,34 @@ export const CartProvider = ({ children }) => {
                 );
 
             if (existingItem) {
+                const currentQuantity =
+                    Number(
+                        existingItem.quantity || 1
+                    );
+
+                const stock =
+                    Number(
+                        existingItem.stock || 0
+                    );
+
+                if (
+                    stock > 0 &&
+                    currentQuantity >= stock
+                ) {
+                    return currentItems;
+                }
 
                 return currentItems.map(
-                    (item) => {
-
-                        const itemId =
-                            item._id || item.id;
-
-                        if (itemId !== productId) {
-                            return item;
-                        }
-
-                        const currentQuantity =
-                            Number(
-                                item.quantity || 1
-                            );
-
-                        const stock =
-                            Number(
-                                item.stock || 0
-                            );
-
-                        // Don't exceed stock
-                        if (
-                            stock > 0 &&
-                            currentQuantity >= stock
-                        ) {
-                            return item;
-                        }
-
-                        return {
-                            ...item,
-                            quantity:
-                                currentQuantity + 1,
-                        };
-                    }
+                    (item) =>
+                        (item._id || item.id) ===
+                            productId
+                            ? {
+                                ...item,
+                                quantity:
+                                    currentQuantity +
+                                    1,
+                            }
+                            : item
                 );
             }
 
@@ -200,13 +254,11 @@ export const CartProvider = ({ children }) => {
         });
     };
 
-
-    // ============================
-    // REMOVE FROM CART
-    // ============================
+    // ==========================================
+    // REMOVE
+    // ==========================================
 
     const removeFromCart = (productId) => {
-
         setCartItems((currentItems) =>
             currentItems.filter(
                 (item) =>
@@ -216,16 +268,13 @@ export const CartProvider = ({ children }) => {
         );
     };
 
-
-    // ============================
-    // INCREASE QUANTITY
-    // ============================
+    // ==========================================
+    // INCREASE
+    // ==========================================
 
     const increaseQuantity = (productId) => {
-
         setCartItems((currentItems) =>
             currentItems.map((item) => {
-
                 const itemId =
                     item._id || item.id;
 
@@ -233,7 +282,7 @@ export const CartProvider = ({ children }) => {
                     return item;
                 }
 
-                const currentQuantity =
+                const quantity =
                     Number(
                         item.quantity || 1
                     );
@@ -245,31 +294,27 @@ export const CartProvider = ({ children }) => {
 
                 if (
                     stock > 0 &&
-                    currentQuantity >= stock
+                    quantity >= stock
                 ) {
                     return item;
                 }
 
                 return {
                     ...item,
-                    quantity:
-                        currentQuantity + 1,
+                    quantity: quantity + 1,
                 };
             })
         );
     };
 
-
-    // ============================
-    // DECREASE QUANTITY
-    // ============================
+    // ==========================================
+    // DECREASE
+    // ==========================================
 
     const decreaseQuantity = (productId) => {
-
         setCartItems((currentItems) =>
             currentItems
                 .map((item) => {
-
                     const itemId =
                         item._id || item.id;
 
@@ -277,34 +322,37 @@ export const CartProvider = ({ children }) => {
                         return item;
                     }
 
-                    const currentQuantity =
+                    const quantity =
                         Number(
                             item.quantity || 1
                         );
 
-                    if (currentQuantity <= 1) {
+                    if (quantity <= 1) {
                         return null;
                     }
 
                     return {
                         ...item,
-                        quantity:
-                            currentQuantity - 1,
+                        quantity: quantity - 1,
                     };
                 })
                 .filter(Boolean)
         );
     };
 
-
-    // ============================
+    // ==========================================
     // CLEAR CART
-    // ============================
+    // ==========================================
 
     const clearCart = () => {
-        setCartItems([]);
-    };
+        const cartKey = getCartKey();
 
+        setCartItems([]);
+
+        if (cartKey) {
+            localStorage.removeItem(cartKey);
+        }
+    };
 
     return (
         <CartContext.Provider
@@ -322,16 +370,12 @@ export const CartProvider = ({ children }) => {
     );
 };
 
-
-// ============================
+// ==========================================
 // USE CART
-// ============================
+// ==========================================
 
 export const useCart = () => {
-
-    const context = useContext(
-        CartContext
-    );
+    const context = useContext(CartContext);
 
     if (!context) {
         throw new Error(
