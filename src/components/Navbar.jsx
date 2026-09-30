@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
     Home,
     Package,
@@ -14,6 +14,8 @@ import { useTheme } from "../context/ThemeContext";
 
 const Navbar = () => {
     const { darkMode, toggleTheme } = useTheme();
+
+      const navigate = useNavigate();
 
     const { cartItems } = useCart();
 
