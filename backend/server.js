@@ -19,7 +19,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: "https://glow-mchc.onrender.com"  ,       //"http://localhost:5173",
+        origin:      "http://localhost:5173",
         credentials: true,
     })
 );
