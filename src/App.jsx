@@ -1,6 +1,5 @@
 import React from "react";
 import "./App.css";
-
 import {
     BrowserRouter,
     Routes,
@@ -59,10 +58,10 @@ function App() {
                     FIRST PAGE
                  */}
 
-                {/* <Route
+                <Route
                     path="/"
                     element={<Navigate to="/login" replace />}
-                /> */}
+                />
 
 
                 {/* 
