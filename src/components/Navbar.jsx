@@ -23,13 +23,14 @@ const Navbar = () => {
     );
 
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-        window.location.href = "/login";
+    window.dispatchEvent(new Event("userChanged"));
 
-    };
+    navigate("/login", { replace: true });
+};
 
     return (
         <nav className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
@@ -163,7 +164,7 @@ const Navbar = () => {
                         {/* ================= LOGOUT ================= */}
                         <button
                             type="button"
-                            onClick={logout}
+                            onClick={handleLogout}
                             className="flex items-center gap-2 text-red-500 hover:text-red-600 transition"
                         >
                             <LogOut size={22} />

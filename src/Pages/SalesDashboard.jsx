@@ -90,13 +90,15 @@ const SalesDashboard = () => {
         }
     };
 
-    const logout = () => {
-            localStorage.removeItem("token");
+const handleLogout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "/login";
+    window.dispatchEvent(new Event("userChanged"));
 
-    };
+    navigate("/login", { replace: true });
+};
+
 
     const totalProducts = products.length;
 
@@ -193,7 +195,7 @@ const SalesDashboard = () => {
 
                             <button
                                 type="button"
-                                onClick={logout}
+                                onClick={handleLogout}
                                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
                             >
                                 <LogOut size={18} />

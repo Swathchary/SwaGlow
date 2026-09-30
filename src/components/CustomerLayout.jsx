@@ -6,7 +6,7 @@ import {
     Package,
     ShoppingCart,
     User,
-    LogOut,
+    handleLogout,
     Menu,
     X,
     Sun,
@@ -23,13 +23,16 @@ function CustomerLayout() {
 
     const { darkMode, toggleTheme } = useTheme();
 
-    const handleLogout = () => {
-            localStorage.removeItem("token");
+   const handleLogout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "/login";
+    window.dispatchEvent(new Event("userChanged"));
 
-    };
+    navigate("/login", { replace: true });
+};
+
+
 
     const closeMobileMenu = () => {
         setMobileMenuOpen(false);

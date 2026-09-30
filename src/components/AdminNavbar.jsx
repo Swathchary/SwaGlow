@@ -17,13 +17,14 @@ const AdminNavbar = () => {
     const savedUser = localStorage.getItem("user");
     const user = savedUser ? JSON.parse(savedUser) : null;
 
-    const logout = () => {
+const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "/login";
-    };
+    window.dispatchEvent(new Event("userChanged"));
 
+    navigate("/login", { replace: true });
+};
     const navClass = ({ isActive }) =>
         `flex items-center gap-2 px-3 py-2 rounded-lg transition ${
             isActive
@@ -125,7 +126,7 @@ const AdminNavbar = () => {
 
                         <button
                             type="button"
-                            onClick={logout}
+                            onClick={handleLogout}
                             className="flex items-center gap-2 px-3 py-2 text-red-500 hover:text-red-600 transition"
                         >
                             <LogOut size={19} />

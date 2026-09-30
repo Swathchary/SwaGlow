@@ -14,15 +14,16 @@ const SalesNavbar = () => {
     const navigate = useNavigate();
     const { darkMode, toggleTheme } = useTheme();
 
-    const logout = () => {
-           localStorage.removeItem("token");
+const handleLogout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "/login";
+    window.dispatchEvent(new Event("userChanged"));
 
-    };
+    navigate("/login", { replace: true });
+};
 
-    const linkStyle = ({ isActive }) =>
+const linkStyle = ({ isActive }) =>
         `flex items-center gap-2 px-4 py-2 rounded-xl transition ${
             isActive
                 ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
@@ -79,7 +80,7 @@ const SalesNavbar = () => {
                     </button>
 
                     <button
-                        onClick={logout}
+                        onClick={handleLogout}
                         className="flex items-center gap-2 p-2 text-red-500"
                     >
                         <LogOut size={19} />

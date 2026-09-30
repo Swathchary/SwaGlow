@@ -40,14 +40,16 @@ export default function DashboardLayout({
 
   const items = menus[role] || menus.customer;
 
-  const logout = () => {
+const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "/login";
-  };
+    window.dispatchEvent(new Event("userChanged"));
 
-  const SidebarContent = () => (
+    navigate("/login", { replace: true });
+};
+
+const SidebarContent = () => (
     <>
       <div className="flex h-20 items-center gap-3
                       border-b border-slate-800 px-5">
@@ -80,7 +82,7 @@ export default function DashboardLayout({
 
       <div className="border-t border-slate-800 p-4">
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="flex w-full items-center gap-3
                      rounded-xl px-4 py-3 text-red-400
                      hover:bg-red-500/10"
