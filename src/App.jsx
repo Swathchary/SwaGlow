@@ -59,10 +59,10 @@ function App() {
                     FIRST PAGE
                  */}
 
-                <Route
+                {/* <Route
                     path="/"
                     element={<Navigate to="/login" replace />}
-                />
+                /> */}
 
 
                 {/* 
